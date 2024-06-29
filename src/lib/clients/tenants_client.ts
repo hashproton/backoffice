@@ -74,11 +74,13 @@ class TenantsClient {
         return data;
     }
 
-    async getTenants(pageNumber = 1, pageSize = 5) {
+    async getTenants(pageNumber = 1, pageSize = 5, filterData: { status: string, name: string }) {
         const { data } = await this.http.get<ApiResponse<PaginatedResponse<Tenant>>>('/tenants', {
             params: {
                 pageNumber,
-                pageSize
+                pageSize,
+                status: filterData.status,
+                name: filterData.name
             }
         });
 

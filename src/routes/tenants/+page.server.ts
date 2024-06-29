@@ -10,10 +10,21 @@ export const load: PageServerLoad = async ({ url, locals }) => {
         redirect(302, '/tenants?page=1');
     }
 
-    const data = await tenantsClient.getTenants(page, 5);
+    let filterData = {
+        status: url.searchParams.get('status') || 'all',
+        name: url.searchParams.get('name') || '',
+    }
+
+    const data = await tenantsClient.getTenants(page, 5, filterData);
     if (!isApiError(data)) {
         if (data.items.length === 0) {
-            redirect(302, `/tenants?page=${data.totalPages}`);
+            return {
+                errors: [
+                    {
+                        message: 'No tenants found. Redirected to the first page.',
+                    }
+                ]
+            }
         }
     }
 
