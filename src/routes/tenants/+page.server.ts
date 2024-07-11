@@ -3,7 +3,6 @@ import type { PageServerLoad } from "./$types";
 import { isApiError, tenantsClient } from "$lib/clients";
 
 export const load: PageServerLoad = async ({ url, locals }) => {
-    console.log(locals.auth.token);
     let page = parseInt(url.searchParams.get('page') || '1')
 
     if (page < 1) {

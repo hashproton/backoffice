@@ -8,7 +8,6 @@
 	import * as Card from '$lib/components/ui/card/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
-	import * as Select from '$lib/components/ui/select/index.js';
 	import * as Pagination from '$lib/components/ui/pagination/index.js';
 
 	import { goto } from '$app/navigation';
@@ -16,7 +15,6 @@
 	import { TenantStatus } from '$lib/clients/tenants_client.js';
 	import { toast } from 'svelte-sonner';
 	import Input from '$lib/components/ui/input/input.svelte';
-	import { redirect } from '@sveltejs/kit';
 	import { page } from '$app/stores';
 
 	function mapTenantStatusColor(status: TenantStatus) {
@@ -59,13 +57,17 @@
 	});
 
 
-	function gotoQs(key: string, value: string) {
+	function gotoQs(key: string, value: string | number) {
+		if (typeof value === 'number') {
+			value = value.toString();
+		}
+
 		query.set(key, value)
 		goto(`?${query.toString()}`);
 	}
 
 	let timeout: number;
-	function handleFilteredName(event: KeyboardEvent) {
+	function handleFilteredName(_: KeyboardEvent) {
 		clearTimeout(timeout);
 		timeout = setTimeout(() => {
 			gotoQs('name', filterData.name);
@@ -96,11 +98,11 @@
 							checked={filterData.status == 'all'}>All</DropdownMenu.CheckboxItem
 						>
 						<DropdownMenu.CheckboxItem
-							onclick={(e) => gotoQs('status', 'active')}
+							onclick={(e) => gotoQs('status', TenantStatus.Active)}
 							checked={filterData.status == 'active'}>Active</DropdownMenu.CheckboxItem
 						>
 						<DropdownMenu.CheckboxItem
-							onclick={(e) => gotoQs('status', 'inactive')}
+							onclick={(e) => gotoQs('status', TenantStatus.Inactive)}
 							checked={filterData.status == 'inactive'}>Inactive</DropdownMenu.CheckboxItem
 						>
 					</DropdownMenu.Content>

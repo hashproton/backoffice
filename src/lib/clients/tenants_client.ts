@@ -1,7 +1,6 @@
 import axios, { type AxiosInstance } from 'axios';
 import { isApiError, type ApiError, type ApiResponse, type PaginatedResponse, type VoidApiResponse } from '.';
-
-
+import { QueryBuilder } from 'fluent-querykit';
 
 export enum TenantStatus {
     Active = 0,
@@ -75,14 +74,23 @@ class TenantsClient {
     }
 
     async getTenants(pageNumber = 1, pageSize = 5, filterData: { status: string, name: string }) {
+        let query = `name @=* "${filterData.name}"`;
+
+        // The tenant status is a string, so we need to convert it to the enum value
+        const status = filterData.status === 'all' ? -1 : TenantStatus[filterData.status as keyof typeof TenantStatus];
+        if (status !== -1) {
+            query += ` && status == ${status}`;
+        }
+
         const { data } = await this.http.get<ApiResponse<PaginatedResponse<Tenant>>>('/tenants', {
             params: {
                 pageNumber,
                 pageSize,
-                status: filterData.status,
-                name: filterData.name
+                filterTerm: query
             }
         });
+
+        console.log(data);
 
         return data
     }
